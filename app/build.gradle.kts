@@ -5,14 +5,14 @@ plugins {
 
 android {
     namespace = "com.noiraube.theportrait"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.noiraube.theportrait"
         minSdk = 26
         targetSdk = 35
-        versionCode = 2
-        versionName = "0.2.0"
+        versionCode = 3
+        versionName = "0.2.1"
     }
 
     compileOptions {

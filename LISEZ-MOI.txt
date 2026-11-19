@@ -1,0 +1,11 @@
+THE PORTRAIT — CORRECTIF DE COMPILATION V0.2.1
+
+Dans GitHub, ouvrez le dépôt The-Portrait puis Add file > Upload files.
+Glissez le contenu de cette archive à la racine du dépôt, en conservant les chemins :
+- build.gradle.kts
+- app/build.gradle.kts
+- .github/workflows/build-apk.yml
+
+GitHub doit demander de remplacer les fichiers existants. Acceptez, puis Commit changes.
+Le workflow installera Android SDK 36, utilisera Android Gradle Plugin 8.9.1 et Gradle 8.11.1.
+La version APK prévue est 0.2.1 (versionCode 3).
