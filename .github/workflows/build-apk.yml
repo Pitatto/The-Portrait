@@ -11,6 +11,9 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      ANDROID_HOME: /usr/local/lib/android/sdk
+      ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
@@ -21,11 +24,13 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Set up Android SDK 36
-        uses: android-actions/setup-android@v3
-
-      - name: Install Android platform and build tools
-        run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
+      - name: Accept Android SDK licenses and install API 36
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/16.0/bin/sdkmanager" --sdk_root="$ANDROID_HOME" --licenses || true
+          "$ANDROID_HOME/cmdline-tools/16.0/bin/sdkmanager" --sdk_root="$ANDROID_HOME" \
+            "platforms;android-36" \
+            "build-tools;36.0.0" \
+            "platform-tools"
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
