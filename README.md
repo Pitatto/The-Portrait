@@ -1,38 +1,68 @@
-# The Portrait — prototype Android
+# The Portrait — version 0.2.0
 
-Prototype de launcher Android pour le Xiaomi Redmi Note 14 5G (Android 16 / HyperOS 3).
+Launcher Android expérimental pour le Xiaomi Redmi Note 14 5G / HyperOS.
 
-**Ce dossier est le projet source, pas encore l'APK.** Le workflow GitHub inclus peut compiler automatiquement l'APK sans installer Android Studio sur ton PC.
+Cette version apporte les fonctions demandées pour la prochaine étape de test :
 
-## Obtenir l'APK sans installer d'outils sur ton PC
+- portrait de violoniste peint, avec teinte et fissures lorsque l'état décrépit est activé ; un mouvement discret de l'archet apparaît pendant la lecture musicale ;
+- panneau musical relié aux sessions multimédias Android (titre, artiste, lecture/pause, piste précédente/suivante) ;
+- carnet à quatre pages : Tâches journalières, Liste de courses, Notes et À venir ; les entrées sont ajoutables, modifiables, supprimables et conservées après fermeture ;
+- montre à gousset qui s'ouvre sur un cadran et affiche le nombre de pas du jour lu dans Santé Connect / Health Connect ;
+- barre de recherche manuscrite qui ouvre une recherche Google ;
+- ChatGPT ajouté à la grille, et icône The Portrait ajoutée au tiroir d'applications Android ;
+- suppression du texte « Glissez pour révéler / restaurer ».
 
-1. Crée un compte GitHub si tu n'en as pas : https://github.com/signup
-2. Depuis un navigateur, ouvre https://github.com/new et crée un dépôt nommé `ThePortrait`. Laisse-le en **Public** pour simplifier l'accès aux actions, puis valide avec **Create repository**.
-3. Sur la page du dépôt, choisis **Add file → Upload files**.
-4. Décompresse l'archive `ThePortrait_Android_Source.zip` sur ton ordinateur. Envoie le contenu du dossier `ThePortrait_Android` dans le dépôt (y compris le dossier caché `.github`). Valide avec **Commit changes**.
-5. Ouvre l'onglet **Actions** du dépôt. Le workflow **Build The Portrait APK** démarre automatiquement. Attends qu'il affiche une coche verte.
-6. Ouvre l'exécution terminée, descends à **Artifacts**, puis télécharge `ThePortrait-debug-apk`.
-7. Décompresse ce fichier sur ton téléphone et ouvre `app-debug.apk`. Si Android le demande, autorise temporairement l'installation depuis cette source.
-8. Pour tester l'écran d'accueil, appuie sur le bouton Accueil et choisis **The Portrait**. Tu pourras revenir à HyperOS en choisissant à nouveau le lanceur système dans les paramètres d'applications par défaut.
+## Permissions à activer après installation
 
-Si la compilation échoue, ouvre l'exécution dans **Actions**, copie le premier message d'erreur rouge et renvoie-le-moi : je corrigerai le projet.
+### Pas — Santé Connect / Health Connect
 
-## Gestes du prototype
+The Portrait demande uniquement la lecture des pas du jour (`READ_STEPS`). Aucune donnée de santé n'est écrite par l'application et rien n'est envoyé à un serveur.
 
-- Glisser vers la gauche : état décrépit.
-- Glisser vers la droite : état préservé.
-- Toucher la montre : ouvrir/fermer le cadran.
-- Toucher une tâche : cocher/décocher.
-- Toucher une icône : lancer l'application si elle est installée.
+1. Ouvrir Google Fit → Profil → Paramètres.
+2. Dans « Santé Connect », activer « Synchroniser Fit avec Santé Connect » et autoriser le partage des pas.
+3. Ouvrir The Portrait et toucher la montre à gousset.
+4. Accorder à The Portrait l'autorisation de lire les pas dans Santé Connect.
 
-## Applications configurées
+Sur Android 14 et ultérieur, Health Connect peut aussi fournir les pas comptés par l'appareil si cette fonction est disponible sur le téléphone. Les données agrégées par Health Connect sont utilisées pour éviter de compter plusieurs fois des enregistrements qui se chevauchent.
 
-Discord, Reddit, Instagram, Facebook, YouTube, YouTube Music, Bandcamp, Outlook, Vinted et Chrome. Les raccourcis utilisent les identifiants Android habituels ; ils peuvent varier selon l'installation.
+### Musique
 
-## Limites connues de cette version
+1. Toucher le panneau musical dans The Portrait.
+2. Android ouvre la page d'accès aux notifications.
+3. Autoriser « The Portrait – musique ».
 
-- Prototype graphique dessiné en formes simples : ce n'est pas encore la version finale avec les portraits et icônes peints.
-- La transition change au relâchement du glissement ; elle ne suit pas encore le doigt en continu.
-- Les tâches ne sont pas conservées après fermeture de l'application.
-- La montre est intégrée à l'écran du launcher, pas un widget Android indépendant.
-- La compilation distante n'a pas encore été exécutée ; le workflow la réalisera lors de l'envoi sur GitHub.
+Cette autorisation système est nécessaire pour voir les sessions multimédias actives et envoyer les commandes de lecture. Elle est révocable à tout moment dans les paramètres Android.
+
+## Gestes et commandes
+
+- Glisser horizontalement hors des widgets : passer de l'état préservé à l'état décrépit et inversement.
+- Dans le carnet : glisser horizontalement pour changer de page ; glisser verticalement pour faire défiler les entrées.
+- Toucher une case dans Tâches ou Courses : cocher/décocher.
+- Toucher « Ajouter… » : créer une entrée.
+- Appui long sur une entrée : modifier ou supprimer.
+- Dans Notes et À venir : toucher une entrée pour la modifier.
+- Toucher la montre : ouvrir/fermer le cadran des pas.
+- Toucher la barre Google : saisir une recherche.
+- Toucher une icône : ouvrir l'application correspondante si elle est installée.
+
+## Compiler l'APK via GitHub Actions
+
+Le workflow `.github/workflows/build-apk.yml` est conservé. Après avoir remplacé les fichiers du dépôt par ceux de cette version et validé les changements sur `main`, l'action **Build The Portrait APK** doit se lancer. Quand elle affiche une coche verte :
+
+1. Ouvrir l'exécution dans l'onglet Actions.
+2. Descendre à « Artifacts ».
+3. Télécharger `ThePortrait-debug-apk`.
+4. Décompresser l'archive et installer `app-debug.apk`.
+
+**Important pour la mise à jour du prototype 0.1 :** les APK de débogage générés par des exécutions GitHub différentes peuvent être signés par des clés différentes. Désinstaller l'ancien « The Portrait » avant d'installer le nouvel APK évite un conflit de signature. Cela efface les données locales du prototype précédent, qui ne stockait pas encore de données persistantes.
+
+## Limites de cette version
+
+- L'animation musicale est un mouvement de l'archet superposé à l'image du violoniste ; ce n'est pas encore une animation complète du bras ou du corps.
+- L'état décrépit est appliqué par désaturation, assombrissement et fissures sur le même portrait ; il ne s'agit pas encore d'une seconde peinture dédiée.
+- La lecture des pas dépend de Santé Connect et des sources autorisées à y écrire des pas. Google Fit doit être synchronisé avec Santé Connect pour y contribuer.
+- L'accès musical nécessite d'activer manuellement l'accès spécial aux notifications.
+- L'affichage météo reste un texte provisoire, non connecté à une source météo.
+- Le rendu est un prototype artistique et fonctionnel, pas encore le thème final avec un jeu complet d'icônes peintes individuellement.
+
+Le projet a été préparé pour la compilation GitHub Actions, mais l'environnement local de cette session ne contient pas le SDK Android : l'APK 0.2.0 n'a donc pas été compilé ni testé ici. Le workflow du dépôt effectuera la compilation après l'envoi des modifications.
