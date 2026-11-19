@@ -251,7 +251,7 @@ class MainActivity : ComponentActivity() {
     private fun launchSearchDialog() {
         val input = EditText(this).apply {
             hint = "Rechercher sur Google…"
-            singleLine = true
+                        setSingleLine(true)
             imeOptions = EditorInfo.IME_ACTION_SEARCH
             setPadding(36, 24, 36, 24)
         }
