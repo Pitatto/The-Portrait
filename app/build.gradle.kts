@@ -11,8 +11,8 @@ android {
         applicationId = "com.noiraube.theportrait"
         minSdk = 26
         targetSdk = 35
-        versionCode = 7
-        versionName = "0.6.0"
+        versionCode = 10
+        versionName = "0.9.0"
     }
 
     signingConfigs {
