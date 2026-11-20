@@ -15,6 +15,16 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4
 
+      - name: Restore stable debug signing key
+        env:
+          KEYSTORE_BASE64: ${{ secrets.THE_PORTRAIT_KEYSTORE_BASE64 }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ]; then
+            echo "Missing repository secret THE_PORTRAIT_KEYSTORE_BASE64"
+            exit 1
+          fi
+          printf '%s' "$KEYSTORE_BASE64" | base64 --decode > app/debug.keystore
+
       - name: Set up Java 17
         uses: actions/setup-java@v4
         with:
