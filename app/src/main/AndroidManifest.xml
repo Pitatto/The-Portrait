@@ -2,6 +2,11 @@
     <uses-permission android:name="android.permission.health.READ_STEPS" />
 
     <queries>
+        <!-- Expose all user-installed and system apps that provide a launcher icon. -->
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
         <package android:name="com.discord" />
         <package android:name="com.reddit.frontpage" />
         <package android:name="com.instagram.android" />
