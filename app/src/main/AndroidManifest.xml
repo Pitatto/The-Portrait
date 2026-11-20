@@ -10,7 +10,7 @@
         <package android:name="com.google.android.apps.youtube.music" />
         <package android:name="com.bandcamp.android" />
         <package android:name="com.microsoft.office.outlook" />
-        <package android:name="com.vinted" />
+        <package android:name="fr.vinted" />
         <package android:name="com.android.chrome" />
         <package android:name="com.openai.chatgpt" />
         <package android:name="com.google.android.apps.fitness" />
