@@ -427,6 +427,9 @@ class MainActivity : ComponentActivity() {
         private var dialBounds = RectF()
         private var bowPhase = 0f
         private val vampirePortrait: Bitmap? = try { BitmapFactory.decodeResource(resources, R.drawable.portrait_vampire_oil) } catch (_: Exception) { null }
+        private val catLetterBitmap: Bitmap? = try { BitmapFactory.decodeResource(resources, R.drawable.tuxedo_cat_letter) } catch (_: Exception) { null }
+        private val telephoneBitmap: Bitmap? = try { BitmapFactory.decodeResource(resources, R.drawable.antique_telephone) } catch (_: Exception) { null }
+        private val oldBookPaper: Bitmap? = try { BitmapFactory.decodeResource(resources, R.drawable.old_book_paper) } catch (_: Exception) { null }
         private val pocketWatch: Bitmap? = try { BitmapFactory.decodeResource(resources, R.drawable.pocket_watch) } catch (_: Exception) { null }
         private val closedPocketWatch: Bitmap? = try { BitmapFactory.decodeResource(resources, R.drawable.pocket_watch_closed) } catch (_: Exception) { null }
         private val wallpaperBitmap: Bitmap? = try { BitmapFactory.decodeResource(resources, R.drawable.the_portrait_wallpaper) } catch (_: Exception) { null }
@@ -568,22 +571,22 @@ class MainActivity : ComponentActivity() {
             val aperture = RectF(145f, 143f, 275f, 318f)
             paint.color = color("#0B111B")
             c.drawOval(RectF(140f, 137f, 280f, 324f), paint)
-            val image = vampirePortrait
-            if (image != null) {
+            vampirePortrait?.let { image ->
                 val oval = Path().apply { addOval(aperture, Path.Direction.CW) }
                 c.save(); c.clipPath(oval)
                 paint.shader = null; paint.colorFilter = null; paint.alpha = 255
                 c.drawBitmap(image, null, aperture, paint)
                 c.restore()
             }
-            // One frame, one portrait, and no artificial second bow stroke.
             portraitFrame?.let {
+                paint.shader = null; paint.colorFilter = null; paint.alpha = 255
                 c.drawBitmap(it, null, RectF(123f, 84f, 297f, 361f), paint)
             } ?: run {
                 paint.color = color("#AEBAC6"); paint.style = Paint.Style.STROKE; paint.strokeWidth = 2.2f
                 c.drawOval(RectF(140f, 137f, 280f, 324f), paint); paint.style = Paint.Style.FILL
             }
         }
+
 
         private fun drawMusicPanel(c: Canvas) {
             val bounds = RectF(56f, 364f, 364f, 448f)
@@ -628,29 +631,41 @@ class MainActivity : ComponentActivity() {
 
         private fun drawNotebookPreview(c: Canvas) {
             val bounds = RectF(14f, 456f, 211f, 634f)
-            paint.shader = LinearGradient(14f, 456f, 211f, 634f, color("#99A9B7"), color("#293B4D"), Shader.TileMode.CLAMP)
+            paint.shader = LinearGradient(14f, 456f, 211f, 634f, color("#6E7883"), color("#202F3D"), Shader.TileMode.CLAMP)
             c.drawRoundRect(bounds, 11f, 11f, paint); paint.shader = null
-            rounded(c, RectF(19f, 461f, 206f, 629f), 8f, color("#D7DDE2"), color("#C0CBD4"), 1f)
-            rounded(c, RectF(23f, 465f, 202f, 625f), 6f, Color.TRANSPARENT, color("#A4B1BD"), .55f)
-            line(c, 28f, 470f, 28f, 620f, color("#8998A6"), 1.7f)
-            drawText(c, pageTitles[bookPage], 40f, 482f, 15.5f, color("#273747"), italic = true)
-            centered(c, "›", 194f, 482f, 21f, color("#657687"))
-            line(c, 36f, 491f, 194f, 491f, color("#8796A4"), .8f)
-            centered(c, "✥", 114f, 495f, 8f, color("#8292A1"))
+            rounded(c, RectF(19f, 461f, 206f, 629f), 8f, color("#202B36"), color("#AEB9C2"), 1.1f)
+            val pageRect = RectF(24f, 466f, 201f, 624f)
+            oldBookPaper?.let { c.drawBitmap(it, null, pageRect, paint) } ?: rounded(c, pageRect, 4f, color("#D8D3C8"), color("#8D969D"), .8f)
+            rounded(c, pageRect, 4f, Color.TRANSPARENT, color("#8F999F"), .65f)
+            line(c, 33f, 472f, 33f, 618f, color("#8B969E"), 1.2f)
+            drawText(c, pageTitles[bookPage], 43f, 483f, 15f, color("#273746"), italic = true)
+            centered(c, "›", 193f, 483f, 21f, color("#657687"))
+            line(c, 41f, 491f, 190f, 491f, color("#7D8991"), .75f)
+            centered(c, "✥", 114f, 495f, 8f, color("#82909A"))
 
             val page = bookPages[bookPage]
             val baseline = 519f
             val rowStep = 25.5f
             page.drop(bookScroll).take(4).forEachIndexed { visible, entry ->
                 val y = baseline + visible * rowStep
-                line(c, 35f, y + 5f, 193f, y + 5f, color("#AAB6C0"), .42f)
-                drawCheckbox(c, 37f, y - 12f, entry.done, 13f)
-                drawText(c, entry.text.take(20), 60f, y, 12.3f, color("#263442"), handwritten = true)
+                line(c, 41f, y + 5f, 190f, y + 5f, color("#87939B"), .42f)
+                drawCheckbox(c, 42f, y - 12f, entry.done, 13f)
+                drawText(c, entry.text.take(19), 64f, y, 12.1f, color("#273746"), handwritten = true)
             }
-            drawText(c, "+ Ajouter…", 60f, 617f, 11f, color("#46596B"), italic = true)
+            drawText(c, "+ Ajouter…", 64f, 617f, 11f, color("#455969"), italic = true)
             centered(c, "✦", 185f, 619f, 12f, color("#68798A"))
-            // Small corner engraving keeps the widget in the same silver material language.
-            centered(c, "❧", 194f, 471f, 10f, color("#7A8B9B"))
+        }
+
+
+        private fun drawBitmapContained(c: Canvas, bitmap: Bitmap?, bounds: RectF) {
+            if (bitmap == null) return
+            val scale = min(bounds.width() / bitmap.width.toFloat(), bounds.height() / bitmap.height.toFloat())
+            val w = bitmap.width * scale
+            val h = bitmap.height * scale
+            val dst = RectF(bounds.centerX() - w / 2f, bounds.centerY() - h / 2f,
+                bounds.centerX() + w / 2f, bounds.centerY() + h / 2f)
+            paint.shader = null; paint.colorFilter = null; paint.alpha = 255
+            c.drawBitmap(bitmap, null, dst, paint)
         }
 
         private fun drawCheckbox(c: Canvas, x: Float, y: Float, done: Boolean, size: Float) {
@@ -737,54 +752,18 @@ class MainActivity : ComponentActivity() {
 
         private fun drawCurtainPanel(c: Canvas, rect: RectF, left: Boolean) {
             if (rect.width() <= 1f) return
-            val w = rect.width()
-            val body = Path().apply {
-                moveTo(rect.left, rect.top)
-                lineTo(rect.right, rect.top)
-                lineTo(rect.right, rect.bottom - 14f)
-                cubicTo(rect.right - w * .12f, rect.bottom - 5f,
-                    rect.right - w * .32f, rect.bottom - 7f, rect.right - w * .48f, rect.bottom - 13f)
-                cubicTo(rect.right - w * .68f, rect.bottom - 19f,
-                    rect.right - w * .86f, rect.bottom - 9f, rect.left, rect.bottom - 15f)
-                close()
+            paint.color = 0x55000000; c.drawRect(rect.left + if (left) rect.width() - 5f else 0f, rect.top, rect.left + if (left) rect.width() else 5f, rect.bottom, paint)
+            paint.shader = LinearGradient(rect.left, 0f, rect.right, 0f, intArrayOf(color("#0A1421"), color("#324B61"), color("#172637"), color("#070F19")), null, Shader.TileMode.CLAMP)
+            c.drawRect(rect, paint); paint.shader = null
+            for (i in 0..6) {
+                val x = rect.left + rect.width() * i / 6f
+                line(c, x, rect.top + 4f, x + if (left) 8f else -8f, rect.bottom, color(if (i % 2 == 0) "#AAB8C4" else "#142437"), 1.15f)
             }
-            paint.color = 0x66000000; c.drawRect(rect.left + if (left) w - 5f else 0f,
-                rect.top, rect.left + if (left) w else 5f, rect.bottom, paint)
-            paint.shader = LinearGradient(rect.left, 0f, rect.right, 0f,
-                intArrayOf(color("#050C15"), color("#1F3448"), color("#40586D"), color("#1A2B3E"), color("#050C15")),
-                floatArrayOf(0f, .22f, .48f, .76f, 1f), Shader.TileMode.CLAMP)
-            c.drawPath(body, paint); paint.shader = null
-
-            // Deep and bright folds create a velvet texture rather than flat vertical bars.
-            for (i in 0..8) {
-                val t = i / 8f
-                val x = rect.left + w * t
-                val bend = if (left) 1f else -1f
-                val fold = Path().apply {
-                    moveTo(x, rect.top + 3f)
-                    cubicTo(x + bend * w * .06f, rect.top + rect.height() * .27f,
-                        x - bend * w * .045f, rect.top + rect.height() * .72f,
-                        x + bend * w * .025f, rect.bottom - 18f)
-                }
-                paint.color = color(if (i % 2 == 0) "#8798A8" else "#07111D")
-                paint.alpha = if (i % 2 == 0) 100 else 170
-                paint.strokeWidth = if (i % 2 == 0) 1.5f else 2.3f
-                paint.style = Paint.Style.STROKE
-                c.drawPath(fold, paint)
-                paint.alpha = 255; paint.style = Paint.Style.FILL
-            }
-
-            // Silver piping and a restrained embroidered edge on the side facing the opening.
-            val openingX = if (left) rect.right - 2f else rect.left + 2f
-            line(c, rect.left, rect.top + 2f, rect.right, rect.top + 2f, color("#C2CCD5"), 1.5f)
-            line(c, rect.left, rect.bottom - 15f, rect.right, rect.bottom - 15f, color("#7F91A2"), .8f)
-            line(c, openingX, rect.top + 2f, openingX, rect.bottom - 14f, color("#D5DEE5"), 1.45f)
-            val tasselX = if (left) rect.right - min(15f, w * .28f) else rect.left + min(15f, w * .28f)
-            val tasselY = rect.top + rect.height() * .35f
-            paint.color = color("#C5D0D9"); c.drawCircle(tasselX, tasselY, 3f, paint)
-            line(c, tasselX, tasselY + 3f, tasselX, tasselY + 33f, color("#AEBBC6"), 1.2f)
-            centered(c, "❧", tasselX, tasselY + 24f, 14f, color("#D1DAE2"))
-            paint.color = color("#9AAAB8"); c.drawCircle(tasselX, tasselY + 36f, 2f, paint)
+            line(c, rect.left, rect.top + 2f, rect.right, rect.top + 2f, color("#B7C2CC"), 1.5f)
+            val tasselX = if (left) rect.right - 13f else rect.left + 13f
+            line(c, tasselX, rect.top + 10f, tasselX, rect.bottom - 10f, color("#CBD5DE"), 1.1f)
+            paint.color = color("#CBD5DE"); c.drawCircle(tasselX, rect.top + 11f, 3f, paint)
+            centered(c, "❧", tasselX, rect.top + 30f, 18f, color("#CBD5DE"))
         }
 
         private fun drawOpenBook(c: Canvas) {
@@ -804,32 +783,36 @@ class MainActivity : ComponentActivity() {
         }
 
         private fun drawBookPage(c: Canvas, rect: RectF, pageIndex: Int) {
-            paint.shader = LinearGradient(rect.left, rect.top, rect.right, rect.bottom, intArrayOf(color("#E4E9ED"), color("#C7D1D9"), color("#E7ECEF")), null, Shader.TileMode.CLAMP)
-            c.drawRect(rect, paint); paint.shader = null
-            paint.color = color("#9AA8B5"); paint.style = Paint.Style.STROKE; paint.strokeWidth = .8f
+            oldBookPaper?.let { c.drawBitmap(it, null, rect, paint) } ?: run {
+                paint.shader = LinearGradient(rect.left, rect.top, rect.right, rect.bottom,
+                    intArrayOf(color("#E0DDD4"), color("#C9C5BA"), color("#E5E1D7")), null, Shader.TileMode.CLAMP)
+                c.drawRect(rect, paint); paint.shader = null
+            }
+            paint.color = color("#87939B"); paint.style = Paint.Style.STROKE; paint.strokeWidth = .8f
             c.drawRect(rect, paint); paint.style = Paint.Style.FILL
             val index = pageIndex.coerceIn(0, 3)
-            centered(c, pageTitles[index], rect.centerX(), rect.top + 42f, 12.5f, color("#2C3C4C"), italic = true)
-            line(c, rect.left + 13f, rect.top + 52f, rect.right - 13f, rect.top + 52f, color("#AAB7C2"), .8f)
+            centered(c, pageTitles[index], rect.centerX(), rect.top + 42f, 12.5f, color("#2C3946"), italic = true)
+            line(c, rect.left + 13f, rect.top + 52f, rect.right - 13f, rect.top + 52f, color("#8F999E"), .8f)
             val entries = bookPages[index]
-            // Each handwritten baseline sits directly on a fixed ruled line.
-            val startY = rect.top + 93f // handwriting baseline
+            val startY = rect.top + 93f
             val rowStep = 48f
             val visibleCount = max(1, ((rect.bottom - startY - 38f) / rowStep).toInt())
             for (i in 0 until visibleCount) {
                 val guideY = startY + i * rowStep + 6f
-                line(c, rect.left + 12f, guideY, rect.right - 12f, guideY, color("#AAB6C0"), .42f)
+                line(c, rect.left + 12f, guideY, rect.right - 12f, guideY, color("#87939B"), .45f)
             }
             entries.drop(bookScroll).take(visibleCount).forEachIndexed { visible, entry ->
                 val y = startY + visible * rowStep
                 drawCheckbox(c, rect.left + 13f, y - 15f, entry.done, 13f)
-                drawText(c, entry.text.take(22), rect.left + 33f, y, 12.5f, color("#273746"), handwritten = true)
-                rounded(c, RectF(rect.right - 31f, y - 15f, rect.right - 8f, y + 5f), 5f, color("#E1E7EB"), color("#8C9BA9"), .6f)
-                centered(c, "×", rect.right - 19.5f, y + 1f, 14f, color("#5C4651"))
+                drawText(c, entry.text.take(22), rect.left + 33f, y, 12.5f, color("#27333D"), handwritten = true)
+                rounded(c, RectF(rect.right - 31f, y - 15f, rect.right - 8f, y + 5f), 5f,
+                    color("#DBD7CC"), color("#89949A"), .6f)
+                centered(c, "×", rect.right - 19.5f, y + 1f, 14f, color("#6A5354"))
             }
-            drawText(c, "+ Ajouter…", rect.left + 24f, rect.bottom - 18f, 12f, color("#506579"), italic = true)
-            centered(c, "✧", rect.right - 18f, rect.bottom - 17f, 12f, color("#718597"))
+            drawText(c, "+ Ajouter…", rect.left + 24f, rect.bottom - 18f, 12f, color("#455969"), italic = true)
+            centered(c, "✧", rect.right - 18f, rect.bottom - 17f, 12f, color("#71808B"))
         }
+
 
         private fun refreshDrawerApps() {
             val excluded = apps.mapTo(mutableSetOf()) { it.packageName }.apply { add(packageName) }
@@ -906,8 +889,8 @@ class MainActivity : ComponentActivity() {
             if (!drawerSearchEditing) drawText(c, searchCaption.take(31), 52f, 184f, 13f, color("#334657"), italic = true)
             centered(c, "⌕", 365f, 186f, 23f, color("#536A7D"))
 
-            messageBounds = RectF(92f, 218f, 176f, 292f)
-            dialBounds = RectF(244f, 218f, 328f, 292f)
+            messageBounds = RectF(76f, 208f, 188f, 330f)
+            dialBounds = RectF(232f, 208f, 344f, 330f)
             drawTuxedoCatLetter(c, messageBounds.centerX(), messageBounds.centerY())
             drawTelephoneHorn(c, dialBounds.centerX(), dialBounds.centerY())
 
@@ -970,114 +953,16 @@ class MainActivity : ComponentActivity() {
         }
 
         private fun drawTuxedoCatLetter(c: Canvas, cx: Float, cy: Float) {
-            c.save()
-            c.translate(cx, cy)
-
-            // Curled tail and compact seated body, in blue-black fur.
-            paint.color = color("#172433"); paint.style = Paint.Style.STROKE
-            paint.strokeWidth = 8f; paint.strokeCap = Paint.Cap.ROUND
-            val tail = Path().apply {
-                moveTo(-19f, 20f); cubicTo(-44f, 27f, -43f, -2f, -28f, -10f)
-                cubicTo(-17f, -17f, -10f, -8f, -17f, -1f)
-            }
-            c.drawPath(tail, paint); paint.style = Paint.Style.FILL
-            paint.shader = LinearGradient(-28f, -15f, 28f, 36f, color("#354657"), color("#0B1420"), Shader.TileMode.CLAMP)
-            c.drawOval(RectF(-27f, -6f, 27f, 37f), paint); paint.shader = null
-
-            // Ears and head silhouette.
-            val ears = Path().apply {
-                moveTo(-24f, -12f); lineTo(-27f, -35f); lineTo(-9f, -25f)
-                lineTo(7f, -27f); lineTo(26f, -38f); lineTo(23f, -9f)
-                close()
-            }
-            paint.color = color("#111C29"); c.drawPath(ears, paint)
-            paint.color = color("#202F3E"); c.drawCircle(0f, -14f, 25f, paint)
-            paint.color = color("#D4DCE2")
-            c.drawOval(RectF(-20f, -10f, -1f, 10f), paint)
-            c.drawOval(RectF(1f, -10f, 20f, 10f), paint)
-            // White muzzle, bib and paws make the tuxedo marking unmistakable.
-            c.drawOval(RectF(-11f, 1f, 11f, 15f), paint)
-            val bib = Path().apply {
-                moveTo(-9f, 7f); cubicTo(-15f, 18f, -12f, 29f, 0f, 32f)
-                cubicTo(12f, 29f, 15f, 18f, 9f, 7f); close()
-            }
-            c.drawPath(bib, paint)
-            paint.color = color("#AFC1CF")
-            c.drawCircle(-9f, -16f, 2.4f, paint); c.drawCircle(9f, -16f, 2.4f, paint)
-            paint.color = color("#172432"); c.drawCircle(-9f, -16f, 1f, paint); c.drawCircle(9f, -16f, 1f, paint)
-            val nose = Path().apply { moveTo(-3f, -4f); lineTo(3f, -4f); lineTo(0f, 0f); close() }
-            paint.color = color("#7E919F"); c.drawPath(nose, paint)
-            line(c, -2f, 0f, -10f, 3f, color("#6F8292"), .7f)
-            line(c, 2f, 0f, 10f, 3f, color("#6F8292"), .7f)
-            for (side in listOf(-1f, 1f)) {
-                line(c, side * 10f, 1f, side * 22f, -1f, color("#AEBBC5"), .55f)
-                line(c, side * 10f, 5f, side * 23f, 7f, color("#AEBBC5"), .55f)
-            }
-
-            // A folded letter held in both white paws, with a small wax seal.
-            rounded(c, RectF(-19f, 9f, 19f, 31f), 2.5f, color("#DDE3E8"), color("#718292"), .9f)
-            line(c, -17f, 11f, 0f, 23f, color("#94A3B0"), .7f)
-            line(c, 17f, 11f, 0f, 23f, color("#94A3B0"), .7f)
-            paint.color = color("#7D8791"); c.drawCircle(0f, 23f, 3.3f, paint)
-            centered(c, "✥", 0f, 25f, 4.7f, color("#E5EAEE"))
-            paint.color = color("#E2E7EB")
-            c.drawOval(RectF(-25f, 8f, -13f, 17f), paint)
-            c.drawOval(RectF(13f, 8f, 25f, 17f), paint)
-            c.restore()
+            val bounds = RectF(cx - 53f, cy - 64f, cx + 53f, cy + 64f)
+            drawBitmapContained(c, catLetterBitmap, bounds)
         }
+
 
         private fun drawTelephoneHorn(c: Canvas, cx: Float, cy: Float) {
-            c.save(); c.translate(cx, cy); c.scale(.68f, .68f)
-            // Heavy pedestal with stepped silver feet.
-            rounded(c, RectF(-51f, 26f, 51f, 43f), 7f, color("#233344"), color("#B9C5CF"), 1.3f)
-            rounded(c, RectF(-43f, 20f, 43f, 34f), 5f, color("#526779"), color("#D5DDE4"), .8f)
-            line(c, -45f, 29f, 45f, 29f, color("#D8E0E6"), .7f)
-
-            // Circular rotary dial and finger holes.
-            paint.color = color("#172637"); paint.style = Paint.Style.FILL; c.drawCircle(0f, 19f, 23f, paint)
-            paint.color = color("#9CAEBB"); paint.style = Paint.Style.STROKE; paint.strokeWidth = 2.1f
-            c.drawCircle(0f, 19f, 22f, paint); c.drawCircle(0f, 19f, 15f, paint); paint.style = Paint.Style.FILL
-            for (i in 0 until 10) {
-                val a = Math.toRadians(i * 36.0 - 90.0)
-                val hx = (cos(a) * 17.8).toFloat(); val hy = 19f + (sin(a) * 17.8).toFloat()
-                paint.color = color("#070F18"); c.drawCircle(hx, hy, 2.6f, paint)
-                paint.color = color("#9EADBA"); c.drawCircle(hx - .5f, hy - .5f, .8f, paint)
-            }
-            centered(c, "✥", 0f, 22f, 10f, color("#D1DAE2"))
-
-            // Pierced central stem and trumpet mouthpiece.
-            paint.shader = LinearGradient(-8f, -36f, 9f, 21f, color("#D4DDE4"), color("#405568"), Shader.TileMode.CLAMP)
-            val stem = Path().apply {
-                moveTo(-7f, 15f); lineTo(-6f, -24f); lineTo(6f, -24f); lineTo(7f, 15f); close()
-            }
-            c.drawPath(stem, paint); paint.shader = null
-            line(c, -3f, -20f, -3f, 10f, color("#E2E8ED"), .7f)
-            val horn = Path().apply {
-                moveTo(4f, -22f); cubicTo(12f, -31f, 22f, -41f, 31f, -43f)
-                lineTo(47f, -35f); cubicTo(40f, -25f, 25f, -21f, 8f, -15f); close()
-            }
-            paint.shader = LinearGradient(8f, -43f, 45f, -16f, color("#DCE3E8"), color("#526779"), Shader.TileMode.CLAMP)
-            c.drawPath(horn, paint); paint.shader = null
-            paint.color = color("#172637"); paint.style = Paint.Style.STROKE; paint.strokeWidth = 2f
-            c.drawOval(RectF(29f, -43f, 49f, -32f), paint); paint.style = Paint.Style.FILL
-            line(c, 15f, -25f, 34f, -37f, color("#E1E7EC"), .8f)
-
-            // Hanging receiver with a braided cord, separate from the horn.
-            val receiver = Path().apply {
-                moveTo(-10f, -29f); cubicTo(-25f, -33f, -29f, -20f, -27f, -12f)
-                cubicTo(-24f, -4f, -16f, -2f, -12f, -8f)
-            }
-            paint.color = color("#AAB8C4"); paint.style = Paint.Style.STROKE; paint.strokeWidth = 3.6f; paint.strokeCap = Paint.Cap.ROUND
-            c.drawPath(receiver, paint); paint.style = Paint.Style.FILL
-            paint.color = color("#D0D9E1")
-            c.drawCircle(-27f, -12f, 5.8f, paint); c.drawCircle(-10f, -29f, 5.8f, paint)
-            line(c, -31f, -12f, -22f, -12f, color("#34495B"), 1f)
-            line(c, -14f, -29f, -6f, -29f, color("#34495B"), 1f)
-            paint.color = color("#91A2B1"); paint.style = Paint.Style.STROKE; paint.strokeWidth = 1.5f
-            val cord = Path().apply { moveTo(-28f, -5f); cubicTo(-45f, 2f, -43f, 20f, -32f, 27f) }
-            c.drawPath(cord, paint); paint.style = Paint.Style.FILL
-            c.restore()
+            val bounds = RectF(cx - 56f, cy - 66f, cx + 56f, cy + 66f)
+            drawBitmapContained(c, telephoneBitmap, bounds)
         }
+
 
         private fun drawOpenWatch(c: Canvas) {
             val progress = watchOpenProgress.coerceIn(0f, 1f)
@@ -1095,83 +980,83 @@ class MainActivity : ComponentActivity() {
                 Color.TRANSPARENT, color("#586D80"), .7f)
 
             val watchRect = RectF(82f, 46f, 338f, 366f)
-            pocketWatch?.let { c.drawBitmap(it, null, watchRect, paint) }
+            pocketWatch?.let {
+                paint.alpha = 255; paint.colorFilter = null; paint.shader = null
+                c.drawBitmap(it, null, watchRect, paint)
+            }
             paint.alpha = 255
             drawLiveClockFace(c, watchRect)
 
             val format = NumberFormat.getIntegerInstance(Locale.FRANCE)
             centered(c, "${format.format(stepsToday)} pas", 210f, 415f, 25f, ivory(), italic = true)
-            // Keep the open watch alive: the second hand is recalculated and redrawn once per second.
+            // Recompute the phone's local time every second while the watch is open.
             if (watchOpen && watchOpenProgress > 0.98f) postInvalidateDelayed(1000L)
         }
 
         private fun drawLiveClockFace(c: Canvas, watchRect: RectF) {
-            // Coordinates are mapped to the dial aperture of the matching open-gousset artwork.
-            val cx = watchRect.left + watchRect.width() * (333f / 760f)
-            val cy = watchRect.top + watchRect.height() * (510f / 950f)
-            val rx = watchRect.width() * (184f / 760f)
-            val ry = watchRect.height() * (184f / 950f)
+            // Coordinates match the empty dial aperture in the open pocket-watch artwork.
+            // Measured against the actual cream dial in pocket_watch.webp (760 × 950).
+            // These values align the live dial with the watch bezel, not the artwork's full canvas.
+            val cx = watchRect.left + watchRect.width() * (303f / 760f)
+            val cy = watchRect.top + watchRect.height() * (502f / 950f)
+            val rx = watchRect.width() * (205f / 760f)
+            val ry = watchRect.height() * (205f / 950f)
             val face = RectF(cx - rx, cy - ry, cx + rx, cy + ry)
 
-            // This ivory disc intentionally covers the static numerals and static hands baked into the image.
             paint.shader = RadialGradient(cx - rx * .22f, cy - ry * .28f, rx * 1.35f,
-                intArrayOf(color("#F0E9D8"), color("#D8D0BD"), color("#BEB5A3")),
+                intArrayOf(color("#F0EADD"), color("#DDD5C4"), color("#C2B9A7")),
                 floatArrayOf(0f, .72f, 1f), Shader.TileMode.CLAMP)
+            paint.colorFilter = null; paint.alpha = 255
             c.drawOval(face, paint); paint.shader = null
             paint.color = color("#766E60"); paint.style = Paint.Style.STROKE; paint.strokeWidth = .8f
             c.drawOval(RectF(face.left + 1.4f, face.top + 1.4f, face.right - 1.4f, face.bottom - 1.4f), paint)
             c.drawOval(RectF(face.left + 4.2f, face.top + 4.2f, face.right - 4.2f, face.bottom - 4.2f), paint)
             paint.style = Paint.Style.FILL
 
-            // Minute graduations and Roman numerals are drawn anew over the clean face.
             for (tick in 0 until 60) {
                 val angle = Math.toRadians(tick * 6.0 - 90.0)
-                val outerX = cx + cos(angle).toFloat() * (rx * .88f)
-                val outerY = cy + sin(angle).toFloat() * (ry * .88f)
-                val innerRadius = if (tick % 5 == 0) .78f else .84f
-                val innerX = cx + cos(angle).toFloat() * (rx * innerRadius)
-                val innerY = cy + sin(angle).toFloat() * (ry * innerRadius)
+                val ux = cos(angle).toFloat(); val uy = sin(angle).toFloat()
+                val outerX = cx + ux * (rx * .88f)
+                val outerY = cy + uy * (ry * .88f)
+                val innerRadius = if (tick % 5 == 0) .78f else .845f
+                val innerX = cx + ux * (rx * innerRadius)
+                val innerY = cy + uy * (ry * innerRadius)
                 line(c, outerX, outerY, innerX, innerY,
-                    color(if (tick % 5 == 0) "#4E4A43" else "#847B6C"), if (tick % 5 == 0) .85f else .42f)
+                    color(if (tick % 5 == 0) "#514A40" else "#8B8170"), if (tick % 5 == 0) .9f else .45f)
             }
             val roman = arrayOf("XII", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI")
             for (i in 0 until 12) {
                 val angle = Math.toRadians(i * 30.0 - 90.0)
                 val tx = cx + cos(angle).toFloat() * (rx * .68f)
                 val ty = cy + sin(angle).toFloat() * (ry * .68f) + 2.8f
-                centered(c, roman[i], tx, ty, if (i % 3 == 0) 8.2f else 7.4f, color("#292923"))
+                centered(c, roman[i], tx, ty, if (i % 3 == 0) 8.3f else 7.4f, color("#292923"))
             }
 
             val now = Calendar.getInstance()
-            val hour = now.get(Calendar.HOUR) % 12
+            val hour = now.get(Calendar.HOUR_OF_DAY) % 12
             val minute = now.get(Calendar.MINUTE)
             val second = now.get(Calendar.SECOND)
             val millis = now.get(Calendar.MILLISECOND)
-            val secondFraction = second + millis / 1000f
-            val minuteFraction = minute + secondFraction / 60f
-            val hourFraction = hour + minuteFraction / 60f
-            val hourAngle = Math.toRadians(hourFraction * 30.0 - 90.0)
-            val minuteAngle = Math.toRadians(minuteFraction * 6.0 - 90.0)
-            val secondAngle = Math.toRadians(secondFraction * 6.0 - 90.0)
+            val seconds = second + millis / 1000f
+            val minutes = minute + seconds / 60f
+            val hours = hour + minutes / 60f
+            val hourAngle = Math.toRadians(hours * 30.0 - 90.0)
+            val minuteAngle = Math.toRadians(minutes * 6.0 - 90.0)
+            val secondAngle = Math.toRadians(seconds * 6.0 - 90.0)
 
             fun hand(angle: Double, length: Float, tail: Float, width: Float, tint: Int) {
-                val ux = cos(angle).toFloat()
-                val uy = sin(angle).toFloat()
-                val fromX = cx - ux * tail
-                val fromY = cy - uy * tail
-                val toX = cx + ux * length
-                val toY = cy + uy * length
-                line(c, fromX, fromY, toX, toY, tint, width)
+                val ux = cos(angle).toFloat(); val uy = sin(angle).toFloat()
+                line(c, cx - ux * tail, cy - uy * tail, cx + ux * length, cy + uy * length, tint, width)
                 paint.color = tint
-                c.drawCircle(toX, toY, width * .72f, paint)
+                c.drawCircle(cx + ux * length, cy + uy * length, width * .72f, paint)
             }
-            // Hour and minute hands are dark blued steel; the seconds hand is fine, muted burgundy steel.
             hand(hourAngle, rx * .48f, rx * .08f, 2.7f, color("#283A49"))
             hand(minuteAngle, rx * .72f, rx * .09f, 1.8f, color("#344B5C"))
             hand(secondAngle, rx * .80f, rx * .16f, .75f, color("#744A50"))
             paint.color = color("#263A4A"); c.drawCircle(cx, cy, 3.6f, paint)
             paint.color = color("#D5D9D7"); c.drawCircle(cx - .7f, cy - .7f, 1.1f, paint)
         }
+
 
         private fun drawOpenBookPageMarker(c: Canvas, pageIndex: Int, rect: RectF) {
             centered(c, if (pageIndex % 2 == 0) "I" else "II", rect.centerX(), rect.bottom - 9f, 9f, color("#718597"), italic = true)
@@ -1236,7 +1121,7 @@ class MainActivity : ComponentActivity() {
             drawerAnimator?.cancel()
             val target = if (open) 1f else 0f
             drawerAnimator = ValueAnimator.ofFloat(drawerProgress, target).apply {
-                duration = 820L
+                duration = 620L
                 interpolator = DecelerateInterpolator()
                 addUpdateListener { drawerProgress = it.animatedValue as Float; invalidate() }
                 start()
@@ -1388,7 +1273,7 @@ class MainActivity : ComponentActivity() {
                     if (watchBounds.contains(x, y)) { animateWatch(true); return true }
                     if (searchBounds.contains(x, y)) { launchSearchDialog(); return true }
                     appBounds.firstOrNull { it.first.contains(x, y) }?.let { launchApp(it.second.packageName, it.second.label); return true }
-                    // One permanent home-screen composition: horizontal swipes no longer swap portraits.
+                    // One permanent painted portrait: horizontal swipes no longer switch visual states.
                     return true
                 }
             }
